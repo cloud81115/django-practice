@@ -1,0 +1,78 @@
+{% extends 'music/base.html'%}
+{% block title %}Album Detail{% endblock %}
+
+{% block body %}
+<div class = "container-fluid">
+	<div class="row mt-3">
+
+		<div class = "col-sm-4 col-md-3">
+			<div class = "card ">
+				<div class = "card-body">
+					<a href = "{% url 'music:detail' album.id %}">
+						{% if album.album_logo %}
+							<img class="card-img-top img-responsive" src="{{ album.album_logo.url }}" >
+						{% else %}
+							<h3>No image to display</h3>
+						{% endif %}
+					</a>
+					<h1>{{ album.album_title }}</h1>
+					<h2>{{ album.artist }}</h2>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="col-sm-8 col-md-9">
+			<ul class="nav nav-pills" style="margin-bottom: 10px;">
+				<li class="nav-item"><a class= "nav-link active" href="{% url 'music:detail' album.id %}">View All</a></li>
+				<li class="nav-item"><a class= "nav-link" href="#">Add New Song</a></li>
+			</ul>
+
+
+			<div class="card">
+				<div class="card-body">
+					<h3>All Songs</h3>
+					{% if error_message %}
+		                <p><strong>{{ error_message }}</strong></p>
+		            {% endif %}
+		            <table class="table">
+						<thead>
+						    <tr>
+						      <th scope="col">Title</th>
+						      <th scope="col">Audio File</th>
+						      
+						      <th scope="col">Actions</th>
+						    </tr>
+						</thead>
+						<tbody>
+						{% for song in album.song_set.all %}
+						<tr>
+							<td>{{ song.song_title }}</td>
+							<td>
+								<a target="_blank" href= "{{ song.audio_file.url}}">
+								<button type = "button" class ="btn btn-success btn-xs"><i class="fas fa-play"></i>&nbsp;Play</button></a>
+							</td>
+							<td>
+								<form action="#" method="post" style="display: inline;">
+								{% csrf_token %}
+								<input type="hidden" name="song_id" value="{{ song.id }}" />
+								<button type="summit" class = "btn btn-danger btn-xs">
+									<i class="fas fa-trash-alt"></i>&nbsp; Delete
+								</button>
+								</form>
+							</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+					{% if song.is_favorite %}
+						<img src="http://i.imgur.com/b9b13Rd.png" />
+					{% endif %}
+					<br>
+					</table>
+				</div>
+			</div>
+		</div>	
+
+	</div>	
+</div>
+{% endblock %}
