@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome to Django's world</title>
+</head>
+<body>
+	<nav>
+		<ul>
+			<li>
+				<form action="{% url 'logout'%}" method="post">
+					{% csrf_token %}
+				<button type="submit">Logout</button>
+				</form>
+			</li>
+		</ul>
+	</nav>
+{% block content %}
+{% endblock %}
+</body>
+</html>
