@@ -12,8 +12,8 @@
 	<div class="mb-4">
 		<a href="#" class="btn btn-primary" role="button">Reply</a>
 	</div>
-	{% for post in topic.posts.all %}
-    <div class="card mb-2 {% if forloop.first %}border-dark{% endif %}">
+	{% for post in post_reply.object_list %} <!--post_reply.object_list篩選出每頁的數量 -->
+    <div class="card {% if forloop.last %}mb-4{% else %}mb-2{% endif %} {% if forloop.first %}border-dark{% endif %}">
       {% if forloop.first %}
         <div class="card-header text-white bg-dark py-2 px-3">{{ topic.subject }}</div>
       {% endif %}
@@ -35,7 +35,7 @@
             {{ post.message }}
             {% if post.created_by == user %}
               <div class="mt-3">
-                <a href="#" class="btn btn-primary btn-sm" role="button">Edit</a>
+                <a href="{% url 'edit_post' post.topic.board.pk post.topic.pk post.pk %}" class="btn btn-primary btn-sm" role="button">Edit</a>
               </div>
             {% endif %}
           </div>
@@ -43,6 +43,46 @@
       </div>
     </div>
   {% endfor %}
+   
+{% if post_reply.has_other_pages %}
+  <nav aria-label="Post_reply pagination" class="mb-4">
+    <ul class="pagination">
+      {% if post_reply.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ post_reply.previous_page_number }}">Previous</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Previous</span>
+        </li>
+      {% endif %}
 
+      {% for page_num in post_reply.paginator.page_range %}
+        {% if post_reply.number == page_num %}
+          <li class="page-item active">
+            <span class="page-link">
+              {{ page_num }}
+              <span class="sr-only">(current)</span>
+            </span>
+          </li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if post_reply.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ post_reply.next_page_number }}">Next</a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <span class="page-link">Next</span>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}
 
 {% endblock %}
