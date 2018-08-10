@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db.models import Count
 from django.core.paginator import Paginator
+from django.db.models import Q
 # Create your views here.
 """def home(request):
 	boards = Board.objects.all()
@@ -20,6 +21,11 @@ class BoardListView(ListView):
 def board_topics(request, pk):
 	board = get_object_or_404(Board,pk=pk)
 	queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts')-1)
+	query = request.GET.get("q")
+	if query:
+		queryset = queryset.filter(
+			Q(subject__icontains=query)|
+			Q(posts__message__icontains=query))
 	page_num = request.GET.get('page',1)
 	paginator = Paginator(queryset ,10)
 	#page= paginator.get_page(page_num)
@@ -72,12 +78,14 @@ def topic_posts(request, pk, topic_pk):
 	topic.views+=1
 	topic.save()
 	queryset = topic.posts.order_by('-created_at','id')
-	#print(queryset)
+	print(queryset)
 	paginator = Paginator(queryset ,2)
-	print(paginator)
+	#print(paginator)
 	page_num = request.GET.get('page',1)
 	post_reply = paginator.get_page(page_num)
-	print(post_reply)
+	#query = request.GET.get("q")
+	#if query:
+		#queryset = queryset.filter(subject__icontains=query)
 	return render(request, 'topic_posts.html', {'topic': topic,'post_reply':post_reply})
 
 @login_required
@@ -96,7 +104,7 @@ def reply_topic(request, pk, topic_pk):
 	return render(request, 'reply_topic.html', {'topic':topic, 'form':form })
 
 @method_decorator(login_required, name='dispatch')
-class PostUpdateView(UpdateView):
+class PostUpdate View(UpdateView):
 	model = Post
 	fields = ('message',)
 	template_name = 'edit_post.html'
@@ -111,4 +119,4 @@ class PostUpdateView(UpdateView):
 		post.updated_by = self.request.user
 		post.updated_at = timezone.now()
 		post.save()
-		return redirect('topic_post', pk=post.topic.board.pk, topic_pk=post.topic.pk)
+		return redirect('topic_posts', pk=post.topic.board.pk, topic_pk=post.topic.pk)

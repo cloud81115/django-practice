@@ -3,20 +3,29 @@
 	<li class="breadcrumb-item active">Boards</li>		
 {% endblock %}
 {% block content %}
-	<table class="table">
-		<thead class="thead-dark">
-			<tr>
-				<th scope="col">Board</th>
+<style type="text/css">
+	.topic-col{
+		min-width: 16em;
+	}
+	.last-post-col{
+		min-width: 12em;
+	}
+
+</style>
+	<table class="table table-hover " >
+		<thead class="table-secondary">
+			<tr >
+				<th scope="col" class="topic-col">Board</th>
 				<th scope="col">Posts</th>
 				<th scope="col">Topics</th>
-				<th scope="col">Last Post</th>
+				<th scope="col" class="last-post-col">Last Post</th>
 			</tr>
 		</thead>
 		<tbody>
 			{% for board in boards %}
-				<tr>
-					<td>
-						<a href="{% url 'board_topics' board.pk%}">{{ board.name }}<br></a>
+				<tr class="border-left border-info "style="border-left: 3px;">
+					<td >
+						<a class="text-dark" href="{% url 'board_topics' board.pk%}">{{ board.name }}<br></a>
 						<small class="text-muted" d-block>{{ board.description }}</small>
 					</td>
 					<td class="align-middle">{{ board.get_posts_count }}</td>
@@ -39,4 +48,7 @@
 			{% endfor %}
 		</tbody>
 	</table>
+
+	
+
 {% endblock %}
