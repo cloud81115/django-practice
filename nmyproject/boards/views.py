@@ -75,8 +75,9 @@ def new_topic(request, pk):
 
 def topic_posts(request, pk, topic_pk):
 	topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-	topic.views+=1
-	topic.save()
+	if not request.COOKIES.get('topic_%s_read'% topic_pk):
+		topic.views+=1
+		topic.save()
 	queryset = topic.posts.order_by('-created_at','id')
 	print(queryset)
 	paginator = Paginator(queryset ,2)
@@ -86,7 +87,9 @@ def topic_posts(request, pk, topic_pk):
 	#query = request.GET.get("q")
 	#if query:
 		#queryset = queryset.filter(subject__icontains=query)
-	return render(request, 'topic_posts.html', {'topic': topic,'post_reply':post_reply})
+	response = render(request, 'topic_posts.html', {'topic': topic,'post_reply':post_reply})
+	response.set_cookie('topic_%s_read'% topic_pk,'true')
+	return response
 
 @login_required
 def reply_topic(request, pk, topic_pk):
@@ -104,7 +107,7 @@ def reply_topic(request, pk, topic_pk):
 	return render(request, 'reply_topic.html', {'topic':topic, 'form':form })
 
 @method_decorator(login_required, name='dispatch')
-class PostUpdate View(UpdateView):
+class PostUpdateView(UpdateView):
 	model = Post
 	fields = ('message',)
 	template_name = 'edit_post.html'
